@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Creative Words</title>
+  <script src="https://unpkg.com/vue"></script>
+  <script type="text/javascript" src="/words.json"></script>
+</head>
+<body>
+  <div id="app">
+    <div v-if="state == STATES.PLAYING">
+    <h3>Your word:</h3>
+    <h1>{{ randomWords[chosenWordIndex] }}</h1>
+    <h1>{{ time}}</h1>
+
+    <input v-model="inputWord" v-on:keyup.enter="enterWord" autofocus>
+</div>
+    <div v-else-if="state == STATES.FINISHED">
+      <h2>Your word:</h2>
+      <h3>{{ randomWords[chosenWordIndex] }}</h3>
+        <h2>Entered Words</h2>
+        <ol>
+          <li v-for="word in enteredWords">
+            {{ word }}
+          </li>
+        </ol>
+            <button v-on:click="startTimer()">Restart</button>
+    </div>
+<div v-else>
+    <button v-on:click="startTimer()">Start</button>
+</div>
+
+  </div>
+
+  <script>
+
+    var app = new Vue({
+      el: '#app',
+      data: {
+        randomWords: ['apple','banana','dog','cat','car','brush','coffee','farm','planet'],
+        chosenWordIndex: 0,
+        enteredWords : [],
+        inputWord : "",
+        time: 15,
+        timer: null,
+        STATES : {
+          NOTPLAYING: 1,
+          PLAYING: 2,
+          FINISHED: 3,
+        },
+        state : 1
+      },
+      methods: {
+        startTimer: function () {
+          this.$refs.inputWord.focus();
+          this.time = 15;
+          this.enteredWords = [];
+          this.inputWord = ""
+          this.state = this.STATES.PLAYING;
+          this.chosenWordIndex = Math.floor(Math.random() * this.randomWords.length); 
+          this.timer = setInterval(() => this.countdown(), 1000);
+        },
+        countdown: function(){
+          if (this.time > 0){
+            this.time--;
+          }else{
+            this.state = this.STATES.FINISHED;
+            clearInterval(this.timer)
+          }
+
+        },
+        enterWord: function(){
+          this.enteredWords.push(this.inputWord)
+          this.inputWord = "";
+        }
+
+      }
+    })
+  </script>
+</body>
+</html>
